@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.gift.gift_api import router as gift_router
 from app.auth.router_cart import router as cart_router
 from app.products.router_products import router as products_router
+from fastapi import FastAPI, Response
 
 
 # データベースを作成
@@ -36,17 +37,23 @@ app.add_middleware(
 )
 
 
+@app.options("/auth/signup")
+async def options_signup():
+    return Response(status_code=200)
+
+
 @app.post("/register")
 async def register(user: User):
     # 仮処理：登録内容を表示（実際はDB保存など）
     print("登録ユーザー：", user.dict())
     return {"message": f"{user.name}さん、登録ありがとうございます！"}
 
+
 # CORS の設定
-origins = [
+#origins = [
     "http://localhost",  # フロントエンドが動作しているドメイン
     "http://127.0.0.1:3000",  # 必要に応じて他のオリジンも追加
-]
+#]
 
 
 app.include_router(auth_router, prefix="/auth")
