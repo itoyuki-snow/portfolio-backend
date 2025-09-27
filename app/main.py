@@ -29,7 +29,7 @@ class User(BaseModel):
 # CORS ミドルウェアの設定
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # 必要に応じて特定のオリジンを指定
+    allow_origins=["https://itoyuki-snow.github.io"],  # 必要に応じて特定のオリジンを指定
     allow_credentials=True,
     allow_methods=["*"],  # すべての HTTP メソッドを許可
     allow_headers=["*"],  # すべてのヘッダーを許可
