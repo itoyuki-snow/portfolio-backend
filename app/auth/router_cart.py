@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Response
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 from app.auth.utils_email import send_order_confirmation_email
@@ -14,6 +14,11 @@ from sqlalchemy.orm.attributes import flag_modified
 router = APIRouter(tags=["purchase"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+
+@router.options("/signup")
+async def options_signup():
+    return Response(status_code=200)
+
 
 # カート
 

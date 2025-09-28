@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Response
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 from app.schemas import UserCreate, UserLogin, CustomerUpdate, UserUpdate, UserResponse
@@ -9,14 +9,23 @@ from datetime import datetime, timedelta
 from pydantic import BaseModel
 from typing import List
 from jose import JWTError, ExpiredSignatureError, jwt
-
-
-
+from fastapi.responses import JSONResponse
 
 # 認証ルーターを作成
 router = APIRouter(tags=["auth"])
 
 
+@router.options("/signup")
+async def options_signup():
+    return JSONResponse(
+        content={"message": "CORS preflight OK"},
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "https://itoyuki-snow.github.io",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*"
+        }
+    )
 
 # トークンを取得するためのエンドポイントのURL
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -32,6 +41,9 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Username already exists")
     if db.query(User).filter(User.email == user.email).first():
         raise HTTPException(status_code=400, detail="Email already exists")
+
+    if not user.password or len(user.password.encode("utf-8")) > 72:
+        raise HTTPException(status_code=400, detail="パスワードは15文字以内で入力してください")
 
     # パスワードをハッシュ化して新しいユーザーを作成
     hashed_password = get_password_hash(user.password)
@@ -82,11 +94,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     except JWTError:
         raise HTTPException(status_code=403, detail="トークンの検証に失敗しました")
 
-
-
-#@router.get("/products")
-#def get_products(db: Session = Depends(get_db)):
-#   return db.query(Product).all()
 
 
 #マイページ

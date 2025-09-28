@@ -1,5 +1,5 @@
 # app/schemas.py
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import List
 from datetime import date
 
@@ -10,7 +10,7 @@ class UserCreate(BaseModel):
     birthdate: date
     email: EmailStr  # メールアドレス（形式チェック付き）
     address: str
-    password: str  # パスワード
+    password: str = Field(..., min_length=1)  # パスワード
     
     
 

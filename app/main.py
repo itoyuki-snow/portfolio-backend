@@ -11,7 +11,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.gift.gift_api import router as gift_router
 from app.auth.router_cart import router as cart_router
 from app.products.router_products import router as products_router
-from fastapi import FastAPI, Response
 
 
 # データベースを作成
@@ -36,10 +35,9 @@ app.add_middleware(
     allow_headers=["*"],  # すべてのヘッダーを許可
 )
 
-
-@app.options("/auth/signup")
-async def options_signup():
-    return Response(status_code=200)
+@app.get("/")
+def read_root():
+    return {"message": "AmaironoHi backend is alive"}
 
 
 @app.post("/register")
