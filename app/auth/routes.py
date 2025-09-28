@@ -10,7 +10,10 @@ from pydantic import BaseModel
 from typing import List
 from jose import JWTError, ExpiredSignatureError, jwt
 from fastapi.responses import JSONResponse
+import logging
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 # 認証ルーターを作成
@@ -46,8 +49,9 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already exists")
 
     if not user.password or len(user.password.encode("utf-8")) > 72:
-        raise HTTPException(status_code=400, detail="パスワードは15文字以内で入力してください")
-    
+        logger.warning("パスワードが空か、72バイトを超えています")
+        raise HTTPException(status_code=400, detail="パスワードは72バイト以内で入力してください")
+
     print("受け取ったパスワード:", user.password)
     print("バイト長:", len(user.password.encode("utf-8")))
 
