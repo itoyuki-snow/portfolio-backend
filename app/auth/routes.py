@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Response
+from fastapi import APIRouter, HTTPException, Depends, Response, logger
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 from app.schemas import UserCreate, UserLogin, CustomerUpdate, UserUpdate, UserResponse
@@ -10,6 +10,8 @@ from pydantic import BaseModel
 from typing import List
 from jose import JWTError, ExpiredSignatureError, jwt
 from fastapi.responses import JSONResponse
+
+
 
 # 認証ルーターを作成
 router = APIRouter(tags=["auth"])
@@ -33,6 +35,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 # ユーザー登録エンドポイント
 @router.post("/signup")
 def signup(user: UserCreate, db: Session = Depends(get_db)):
+    logger.info(f"受け取ったパスワード: {user.password}")
     """
     新しいユーザーを登録する
     """
@@ -44,7 +47,7 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 
     if not user.password or len(user.password.encode("utf-8")) > 72:
         raise HTTPException(status_code=400, detail="パスワードは15文字以内で入力してください")
-
+    
     print("受け取ったパスワード:", user.password)
     print("バイト長:", len(user.password.encode("utf-8")))
 
