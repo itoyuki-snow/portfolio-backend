@@ -10,7 +10,7 @@ class UserCreate(BaseModel):
     birthdate: date
     email: EmailStr  # メールアドレス（形式チェック付き）
     address: str
-    password: str = Field(..., min_length=1)  # パスワード
+    password: str = Field(..., min_length=1, max_length=72)  # パスワード
     
     
 

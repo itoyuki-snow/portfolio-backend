@@ -45,6 +45,9 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     if not user.password or len(user.password.encode("utf-8")) > 72:
         raise HTTPException(status_code=400, detail="パスワードは15文字以内で入力してください")
 
+    print("受け取ったパスワード:", user.password)
+    print("バイト長:", len(user.password.encode("utf-8")))
+
     # パスワードをハッシュ化して新しいユーザーを作成
     hashed_password = get_password_hash(user.password)
     new_user = User(
