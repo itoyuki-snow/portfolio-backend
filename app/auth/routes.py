@@ -35,6 +35,15 @@ async def options_signup():
 # トークンを取得するためのエンドポイントのURL
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
+def safe_get_password_hash(password: str) -> str:
+    if not password or not isinstance(password, str):
+        raise ValueError("パスワードが空か文字列ではありません")
+    byte_password = password.encode("utf-8")
+    if len(byte_password) > 72:
+        raise ValueError("パスワードは72バイト以内で入力してください")
+    return get_password_hash(password)
+
+
 # ユーザー登録エンドポイント
 @router.post("/signup")
 def signup(user: UserCreate, db: Session = Depends(get_db)):
@@ -47,16 +56,17 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Username already exists")
     if db.query(User).filter(User.email == user.email).first():
         raise HTTPException(status_code=400, detail="Email already exists")
-
+    
     if not user.password or len(user.password.encode("utf-8")) > 72:
         logger.warning("パスワードが空か、72バイトを超えています")
         raise HTTPException(status_code=400, detail="パスワードは72バイト以内で入力してください")
 
-    print("受け取ったパスワード:", user.password)
-    print("バイト長:", len(user.password.encode("utf-8")))
+    try:
+        hashed_password = safe_get_password_hash(user.password)
+    except Exception as e:
+        logger.error(f"パスワードハッシュ化失敗: {e}")
+        raise HTTPException(status_code=400, detail="パスワード形式に問題があります")
 
-    # パスワードをハッシュ化して新しいユーザーを作成
-    hashed_password = get_password_hash(user.password)
     new_user = User(
         username=user.username,
         email=user.email,
@@ -68,7 +78,6 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     return {"message": "アカウントが作成されました"}
-
 
 # ログインエンドポイント
 @router.post("/login")
