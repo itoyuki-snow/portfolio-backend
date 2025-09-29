@@ -47,6 +47,7 @@ def safe_get_password_hash(password: str) -> str:
 # ユーザー登録エンドポイント
 @router.post("/signup")
 def signup(user: UserCreate, db: Session = Depends(get_db)):
+    logger.info(f"受け取ったbirthdate型: {type(user.birthdate)} 値: {user.birthdate}")
     logger.info(f"受け取ったパスワード: {user.password}")
     """
     新しいユーザーを登録する

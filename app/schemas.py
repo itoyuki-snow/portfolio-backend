@@ -13,9 +13,8 @@ class UserCreate(BaseModel):
     password: str = Field(..., min_length=1, max_length=72)  # パスワード
     
     
-
-    class Config:
-        from_attributes = True
+class Config:
+    from_attributes = True
 
 # ユーザーログイン用のスキーマ
 class UserLogin(BaseModel):
